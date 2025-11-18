@@ -1,0 +1,61 @@
+# EXERCICE 1 – RÉGRESSION LINÉAIRE
+
+
+library(FactoMineR)
+library(ggplot2)
+library(dplyr)
+
+# Chargement du dataset
+data("decathlon")
+
+# 1. Sélection des deux variables
+
+df <- decathlon[, c("100m", "400m")]
+
+# Vérification et nettoyage
+summary(df)
+df <- na.omit(df)
+
+# 3. Régression linéaire simple
+
+fit_simple <- lm(`400m` ~ `100m`, data = df)
+
+# Coefficients
+print("Coefficients modèle simple :")
+print(fit_simple$coefficients)
+
+# Résumé du modèle
+print("Résumé du modèle simple :")
+print(summary(fit_simple))
+
+# Graphique
+ggplot(df, aes(x=`100m`, y=`400m`)) +
+  geom_point() +
+  geom_smooth(method="lm", se=FALSE, color="red") +
+  labs(title="Régression linéaire simple : 100m → 400m",
+       x="Temps au 100m",
+       y="Temps au 400m")
+
+# 4. Régression linéaire multiple
+
+df2 <- decathlon[, c("400m", "100m", "Long.jump", "Shot.put")]
+df2 <- na.omit(df2)
+
+fit_multi <- lm(`400m` ~ `100m` + Long.jump + Shot.put, data=df2)
+
+print("Coefficients modèle multiple :")
+print(fit_multi$coefficients)
+
+print("Résumé du modèle multiple :")
+print(summary(fit_multi))
+
+# 5. Graphique : résidus
+
+ggplot(data.frame(residuals = residuals(fit_multi)),
+       aes(x = residuals)) +
+  geom_histogram(bins = 15, color="black", fill="lightblue") +
+  labs(
+    title="Distribution des résidus – Régression multiple",
+    x = "Résidus",
+    y = "Fréquence"
+  )
